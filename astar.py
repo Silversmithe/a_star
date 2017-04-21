@@ -34,6 +34,17 @@ class Search(object):
         frontier = []
         visited = []
 
+    def heuristic(self, current_state, goal_state):
+        """
+        A* heuristic to determine how close the agent is from its current to the goal state
+        the heuristic is the MANHATTAN DISTANCE from the current state to the goal state
+        
+        :param current_state: (State) current state of the agent
+        :param goal_state: (State) final state that determines the current cost
+        :return: (int) predicted cost from current state to goal state
+        """
+        pass
+
     def cost(self, src_state, dest_state):
         """
         Calculates the cost to transition from the source state to the destination state
@@ -48,10 +59,15 @@ class Search(object):
         # determine if the move is uphill or downhill
         if src_elevation > dest_elevation:
             # move is Downhill
-            pass
+            # 1 + (elevation(x_old, y_old) - elevation(x_new, y_new))
+            return 1 + (src_elevation - dest_elevation)
+
         elif src_elevation < dest_elevation:
             # move is Uphill
-            pass
+            # cost: 1 + (elevation(x_new, y_new) - elevation(x_old, y_old))^2
+            return 1 + (dest_elevation - src_elevation)**2
+
         else:
             # move is Flat
-            pass
+            # cost: 1
+            return 1
