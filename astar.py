@@ -43,7 +43,13 @@ class Search(object):
         :param goal_state: (State) final state that determines the current cost
         :return: (int) predicted cost from current state to goal state
         """
-        pass
+        # variables
+        x_goal, x_current = goal_state.position[0], current_state.position[0]
+        y_goal, y_current = goal_state.position[1], current_state.position[1]
+        goal_elevation = self.environment.elevation(x_goal, y_goal)
+        current_elevation = self.environment.elevation(x_current, y_current)
+
+        return abs(x_goal-x_current) + abs(y_goal-y_current) + abs(goal_elevation-current_elevation)
 
     def cost(self, src_state, dest_state):
         """

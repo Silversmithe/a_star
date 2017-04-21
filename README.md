@@ -29,7 +29,7 @@ in main.py
 1
 
 ## Heuristic Function
-|x_goal - x_current| + |y_goal - y_current| + elevation(x_goal, y_goal) - elevation(x_curr, y_curr)|
+|x_goal - x_current| + |y_goal - y_current| + |elevation(x_goal, y_goal) - elevation(x_curr, y_curr)|
 
 You must also consider:
 
