@@ -1,6 +1,23 @@
 # a_star
 For this homework assignment, you will be implementing an A* graph search algorithm.
 
+## Agent
+The agent can move a single location per turn. Each turn it will choose from the following actions:
+
+N(y++)
+<br>
+S(y--)
+<br>
+E(x++)
+<br>
+W(x--)
+
+In addition, the agent will have an "energy bucket" to use, which is the maximum amount of energy
+the agent can use to reach the goal location. The default amount of energy is 100. The default starting
+location for the agent is 0,0 , although the defaults can be changed through the command line arguments 
+in main.py
+
+
 ## Cost Function
 ### Uphill Move Cost
 1 + (elevation(x_new, y_new) - elevation(x_old, y_old))^2
