@@ -32,6 +32,25 @@ class Search(object):
         """
         solution = []
         print "start: a* search"
+        self.test_expansion()
+
+        # while not len(self.frontier) == 0:
+        #     # while the frontier is not empty
+        #     pass
+
+        """
+        loop do
+            if EMPTY?(frontier) then return failure
+            node <- POP(frontier) // chooses lowest cost node in frontier
+            if problem.GOAL-TEST(node.STATE) then return SOLUTION(node)
+            add node.STATE to explored
+            for each action in problem.ACTION(node.STATE) do
+                child <- CHILD-NODE(problem, node, action)
+                if child.STATE is not in explored or frontier then
+                    frontier <- inser(child, frontier)
+                else if child.STATE in frontier with higher PATH-COST then
+                    replace that frontier node with child
+        """
 
         # in the frontier pick the value with the lowest a* value
 
@@ -41,16 +60,46 @@ class Search(object):
         print "end: a* search"
 
     # TRAVERSAL CALCULATION
-    def explore(self, frontier_node):
+    def explore(self, node):
         """
         Explore a frontier node by:
             getting its available neighbor states and calculate their costs
             place these neighbor states in the frontier
             
         :param frontier_node: 
-        :return: 
+        :return: (bool) have we found a solution
         """
-        pass
+        frontier_node = node
+
+        # check and see if the node has already been visited
+        if self.has_been_visited(frontier_node):
+            # if visited, just remove from frontier
+            print "already visited"
+            self.visited.remove(frontier_node)
+            return False
+
+        # check if the node we are expanding is a goal state
+        if self.environment.is_goal_state(frontier_node):
+            # should stop the program
+            print "goal state!"
+            return True
+
+        # remove from frontier
+        self.frontier.remove(frontier_node)
+
+        # add to visited
+        self.visited.append(frontier_node)
+
+        # get the unvisited neighbors of the frontier node and add them to the frontier
+        moves = self.environment.get_available_moves(frontier_node)
+
+        # !!! update the cost of each move to be accurate
+        for move in moves:
+            move.cost_so_far += self.cost(frontier_node, move)
+
+        # add available moves to the frontier
+        self.frontier.extend(moves)
+        return False
 
     # STATE CALCULATIONS
     def a_star(self, src_state, neighbor_state):
@@ -113,6 +162,20 @@ class Search(object):
             # cost: 1
             return 1
 
+    # CHECKING METHODS
+    def has_been_visited(self, current_state):
+        """
+        Check and see if the state we are looking at has the same coordinates
+        as a state we have already looked at
+        
+        :param current_state: 
+        :return: 
+        """
+        for node in self.visited:
+            if current_state.position == node.position:
+                return True
+        return False
+
     # DEBUG METHODS #
     def display_search_state(self, solution, frontier=True, visited=True):
         """
@@ -131,7 +194,8 @@ class Search(object):
         if visited:
             print "\nVisited:"
             for item in self.visited:
-                    print "\t"+str(item),
+                    print "\t"+str(item)
+
         print '-' * 50
 
     def state_calculation_test(self):
@@ -165,3 +229,21 @@ class Search(object):
         print "heuristic value from current (0,0) to neighbor (0,1) is: "+str(self.heuristic(current_state, flat_state))
         print "heuristic value from current (0,0) to neighbor (1,0) is: "+str(self.heuristic(current_state, uphill_state))
         print "heuristic value from current (0,0) to neighbor (4,4) is: "+str(self.heuristic(current_state, goal_state))
+
+    def test_expansion(self):
+        """
+        Testing the exploration of the frontier
+        :return: 
+        """
+        solution = []
+        # one iteration
+        print "First Iteration:"
+        current_state = self.frontier[0]
+        self.explore(current_state)
+        self.display_search_state(solution)
+
+        # pick another to do a second iteration
+        print "Second Iteration:"
+        second_state = self.frontier[0]
+        self.explore(second_state)
+        self.display_search_state(solution)

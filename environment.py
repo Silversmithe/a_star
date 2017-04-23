@@ -119,33 +119,71 @@ class Environment:
 
         # Check N Movement Possible
         if position[0] < self.height-1:
+            # NORTH
             # y position is lower than highest y pos possible
-            possible_moves.append('N')
-
             # make new frontier node
             north_state = State(position[0], position[1]+1)
+
             # update the solution if you take this path
             north_state.moves_so_far.extend(state.moves_so_far)
             north_state.moves_so_far.append('N')
+
             # get cost so far from current state ** will get updated to cost so far in search function
-            north_state.cost_so_far = state.cost_so_far  # not complete cost so far! finished by search.expand()
+            # not complete cost so far! finished by search.expand()
+            north_state.cost_so_far = state.cost_so_far
+
+            # add to possible moves
+            possible_moves.append(north_state)
 
         # Check E Movement Possible
         if position[1] < self.width-1:
+            # EAST
             # x position is lower than highest x pos possible
-            possible_moves.append('E')
             east_state = State(position[0]+1, position[1])
+
+            # update the solution if you take this path
+            east_state.moves_so_far.extend(state.moves_so_far)
+            east_state.moves_so_far.append('E')
+
+            # get cost so far from current state ** will get updated to cost so far in search function
+            # not complete cost so far! finished by search.expand()
+            east_state.cost_so_far = state.cost_so_far
+
+            # add to possible moves
+            possible_moves.append(east_state)
 
         # Check S Movement Possible
         if position[0] > 0:
+            # SOUTH
             # y position is greater than lowest y pos possible
-            possible_moves.append('S')
             south_state = State(position[0], position[1]-1)
+
+            # update the solution if you take this path
+            south_state.moves_so_far.extend(state.moves_so_far)
+            south_state.moves_so_far.append('S')
+
+            # get cost so far from current state ** will get updated to cost so far in search function
+            # not complete cost so far! finished by search.expand()
+            south_state.cost_so_far = state.cost_so_far
+
+            # add to possible moves
+            possible_moves.append(south_state)
 
         # Check W Movement Possible
         if position[1] > 0:
+            # WEST
             # x pos is greater than lowest x pos possible
-            possible_moves.append('W')
-            east_state = State(position[0]-1, position[1])
+            west_state = State(position[0]-1, position[1])
+
+            # update the solution if you take this path
+            west_state.moves_so_far.extend(state.moves_so_far)
+            west_state.moves_so_far.append('W')
+
+            # get cost so far from current state ** will get updated to cost so far in search function
+            # not complete cost so far! finished by search.expand()
+            west_state.cost_so_far = state.cost_so_far
+
+            # add to possible moves
+            possible_moves.append(west_state)
 
         return possible_moves
