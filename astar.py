@@ -141,8 +141,6 @@ class Search(object):
         :tested: TRUE
         :return: 
         """
-        solution = []
-        self.display_search_state(solution)
 
         # current state diagnostics
         # what is the elevation of the position

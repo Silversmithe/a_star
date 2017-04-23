@@ -122,19 +122,30 @@ class Environment:
             # y position is lower than highest y pos possible
             possible_moves.append('N')
 
+            # make new frontier node
+            north_state = State(position[0], position[1]+1)
+            # update the solution if you take this path
+            north_state.moves_so_far.extend(state.moves_so_far)
+            north_state.moves_so_far.append('N')
+            # get cost so far from current state ** will get updated to cost so far in search function
+            north_state.cost_so_far = state.cost_so_far  # not complete cost so far! finished by search.expand()
+
         # Check E Movement Possible
         if position[1] < self.width-1:
             # x position is lower than highest x pos possible
             possible_moves.append('E')
+            east_state = State(position[0]+1, position[1])
 
         # Check S Movement Possible
         if position[0] > 0:
             # y position is greater than lowest y pos possible
             possible_moves.append('S')
+            south_state = State(position[0], position[1]-1)
 
         # Check W Movement Possible
         if position[1] > 0:
             # x pos is greater than lowest x pos possible
             possible_moves.append('W')
+            east_state = State(position[0]-1, position[1])
 
         return possible_moves
