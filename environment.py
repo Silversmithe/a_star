@@ -47,6 +47,7 @@ class Environment:
         """
         Identifies if given coordinates are valid positions
         
+        :tested: TRUE
         :param x_pos: (int) x coordinate position
         :param y_pos: (int) y coordinate position
         :return: (bool) if the coordinate is valid in this elevation map
@@ -58,6 +59,8 @@ class Environment:
     def elevation(self, x_pos, y_pos):
         """
         Return the elevation at a given state
+        
+        :tested: TRUE
         :param x_pos: 
         :param y_pos: 
         :return: 
@@ -73,14 +76,23 @@ class Environment:
         GOAL EVALUATION
         Given a state, determine if it is a goal state or not
         
+        :tested: TRUE
         :param state: (State) state object in question to determine if it is a goal state
         :return: (bool) 
         """
         goal = (self.width-1, self.height-1)
-        x_align = state.position[0] and goal[0]
-        y_align = state.position[1] and goal[1]
+        x_align = state.position[0] == goal[0]
+        y_align = state.position[1] == goal[1]
 
         return x_align and y_align
+
+    def get_goal_state(self):
+        """
+        Returns a state with the position of the goal
+        
+        :return: (State): state that just holds the position of the goal
+        """
+        return State(self.width-1, self.height-1)
 
     def get_available_moves(self, state):
         """
@@ -98,6 +110,7 @@ class Environment:
         
         Consider N before E before S before W
         
+        :tested: TRUE
         :param state: (State) state object in question to find tran
         :return: [State,...] list of states are ordered how they should be considered
         """

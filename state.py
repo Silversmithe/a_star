@@ -19,12 +19,15 @@ class State(object):
         """
         self.position = (x_pos, y_pos)      # a tuple of the current position of the agent
         self.moves_so_far = []              # a list representing all the moves the agent has done until now
-        self.cost_so_far = None             # an integer representing the cost that the agent has used so far
+        # when is cost activated?
+        self.cost_so_far = 0                # an integer representing the cost that the agent has used so far
 
     def __str__(self):
         """
         Expected form:
         Pos=(2, 3) Moves=['N', 'N', 'E', 'E'] Cost=4
+        
+        :tested: TRUE
         :return: (str) representation of the state instance as a string
         """
         return "Pos=" + str(self.position) + " Moves=" + str(self.moves_so_far) + " Cost=" + str(self.cost_so_far)
