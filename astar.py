@@ -33,7 +33,7 @@ class Search(object):
         """
         solution = []
         print "start: a* search"
-        self.test_expansion()
+        # self.test_expansion()
 
         """
         loop do
@@ -49,20 +49,19 @@ class Search(object):
                     replace that frontier node with child
         """
 
+        while True:
+            if len(self.frontier) == 0:
+                return None, self.frontier, self.visited
 
+            self.current_state = self.pick_a_star()
 
-        # while True:
-        #     if len(self.frontier) == 0:
-        #         return None, self.frontier, self.visited
-        #
-        #     self.current_state = self.pick_a_star()
-        #
-        #     # if not, explore the node
-        #     self.explore(self.current_state)
-        #
-        #     # check if the node we are expanding is a goal state
-        #     if self.environment.is_goal_state(self.current_state):
-        #         return self.current_state, self.frontier, self.visited
+            # if not, explore the node
+            self.explore(self.current_state)
+
+            # check if the node we are expanding is a goal state
+            if self.environment.is_goal_state(self.current_state):
+                print self.current_state.moves_so_far
+                return self.current_state, self.frontier, self.visited
 
         # re-iterate
         print "end: a* search"
@@ -71,7 +70,7 @@ class Search(object):
     def calc_a_star(self):
         for node in self.frontier:
             if node.a_star is None:
-                node.a_star = self.a_star(node)
+                node.a_star = self.a_star(self.current_state, node)
 
     def pick_a_star(self):
         """
@@ -84,9 +83,9 @@ class Search(object):
 
         lowest_astar = None
         for node in self.frontier:
-            print node
-            print self.a_star(node)
-            print ""
+            # print node
+            # print self.a_star(self.current_state, node)
+            # print ""
             if lowest_astar is None:
                 lowest_astar = node
 
@@ -144,9 +143,11 @@ class Search(object):
                             move.cost_so_far += self.cost(frontier_node, move)
                             self.frontier.append(move)
 
+        self.calc_a_star()
+
 
     # STATE CALCULATIONS
-    def a_star(self, neighbor_state):
+    def a_star(self, src_state, neighbor_state):
         """
         Calculates the A* value of an unexplored state
         
@@ -158,7 +159,7 @@ class Search(object):
         :param state: (State): state of which we want to find the A* value
         :return: (int) A* value f(x)
         """
-        return self.cost(self.current_state, neighbor_state)+self.heuristic(neighbor_state, self.environment.get_goal_state())
+        return self.cost(src_state, neighbor_state)+self.heuristic(neighbor_state, self.environment.get_goal_state())
 
     def heuristic(self, current_state, goal_state):
         """
