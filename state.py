@@ -21,6 +21,7 @@ class State(object):
         self.moves_so_far = []              # a list representing all the moves the agent has done until now
         # when is cost activated?
         self.cost_so_far = 0                # an integer representing the cost that the agent has used so far
+        self.a_star = None                      # A* value of the state
 
     def __str__(self):
         """

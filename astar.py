@@ -19,6 +19,7 @@ class Search(object):
         self.frontier = [init_state]       # ([state]) list of states not visited yet
         self.visited = []                  # ([state]) list of visited states
         self.environment = environment     # (Environment) pointer to environment variable
+        self.current_state = None          # (State) current state
 
     def search(self):
         """
@@ -34,10 +35,6 @@ class Search(object):
         print "start: a* search"
         self.test_expansion()
 
-        # while not len(self.frontier) == 0:
-        #     # while the frontier is not empty
-        #     pass
-
         """
         loop do
             if EMPTY?(frontier) then return failure
@@ -52,37 +49,68 @@ class Search(object):
                     replace that frontier node with child
         """
 
-        # in the frontier pick the value with the lowest a* value
 
-        # explore that frontier node, putting its children it the frontier and place itself in the visited list
+
+        # while True:
+        #     if len(self.frontier) == 0:
+        #         return None, self.frontier, self.visited
+        #
+        #     self.current_state = self.pick_a_star()
+        #
+        #     # if not, explore the node
+        #     self.explore(self.current_state)
+        #
+        #     # check if the node we are expanding is a goal state
+        #     if self.environment.is_goal_state(self.current_state):
+        #         return self.current_state, self.frontier, self.visited
 
         # re-iterate
         print "end: a* search"
 
     # TRAVERSAL CALCULATION
+    def calc_a_star(self):
+        for node in self.frontier:
+            if node.a_star is None:
+                node.a_star = self.a_star(node)
+
+    def pick_a_star(self):
+        """
+        Pick and return the node with the lowest A* value to be explored
+        
+        :return: (State) node with lowest A* value
+        """
+        if self.current_state is None:
+            return self.frontier[0]
+
+        lowest_astar = None
+        for node in self.frontier:
+            print node
+            print self.a_star(node)
+            print ""
+            if lowest_astar is None:
+                lowest_astar = node
+
+            elif node.a_star < lowest_astar.a_star:
+                lowest_astar = node
+
+        return lowest_astar
+
     def explore(self, node):
         """
         Explore a frontier node by:
             getting its available neighbor states and calculate their costs
             place these neighbor states in the frontier
             
-        :param frontier_node: 
+        :param frontier_node: current node to be explored
         :return: (bool) have we found a solution
         """
         frontier_node = node
 
-        # check and see if the node has already been visited
-        if self.has_been_visited(frontier_node):
-            # if visited, just remove from frontier
-            print "already visited"
-            self.visited.remove(frontier_node)
-            return False
-
-        # check if the node we are expanding is a goal state
-        if self.environment.is_goal_state(frontier_node):
-            # should stop the program
-            print "goal state!"
-            return True
+        # # check and see if the node has already been visited
+        # if self.has_been_visited(frontier_node):
+        #     # if visited, just remove from frontier
+        #     self.frontier.remove(frontier_node)
+        #     return
 
         # remove from frontier
         self.frontier.remove(frontier_node)
@@ -90,19 +118,35 @@ class Search(object):
         # add to visited
         self.visited.append(frontier_node)
 
+        """
+        add node.STATE to explored
+            for each action in problem.ACTION(node.STATE) do
+                child <- CHILD-NODE(problem, node, action)
+                if child.STATE is not in explored or frontier then
+                    frontier <- inser(child, frontier)
+                else if child.STATE in frontier with higher PATH-COST then
+                    replace that frontier node with child
+        """
         # get the unvisited neighbors of the frontier node and add them to the frontier
         moves = self.environment.get_available_moves(frontier_node)
 
         # !!! update the cost of each move to be accurate
         for move in moves:
-            move.cost_so_far += self.cost(frontier_node, move)
+            if not self.has_been_visited(move):
+                move.cost_so_far += self.cost(frontier_node, move)
+                self.frontier.append(move)
 
-        # add available moves to the frontier
-        self.frontier.extend(moves)
-        return False
+            else:
+                for node in self.frontier:
+                    if node.position == move.position:
+                        if self.a_star(node) > self.a_star(move):
+                            self.frontier.remove(node)
+                            move.cost_so_far += self.cost(frontier_node, move)
+                            self.frontier.append(move)
+
 
     # STATE CALCULATIONS
-    def a_star(self, src_state, neighbor_state):
+    def a_star(self, neighbor_state):
         """
         Calculates the A* value of an unexplored state
         
@@ -114,7 +158,7 @@ class Search(object):
         :param state: (State): state of which we want to find the A* value
         :return: (int) A* value f(x)
         """
-        return self.cost(src_state, neighbor_state)+self.heuristic(neighbor_state, self.environment.get_goal_state())
+        return self.cost(self.current_state, neighbor_state)+self.heuristic(neighbor_state, self.environment.get_goal_state())
 
     def heuristic(self, current_state, goal_state):
         """
@@ -238,12 +282,26 @@ class Search(object):
         solution = []
         # one iteration
         print "First Iteration:"
-        current_state = self.frontier[0]
-        self.explore(current_state)
+        self.current_state = self.pick_a_star()
+        self.explore(self.current_state)
         self.display_search_state(solution)
+        self.calc_a_star()
 
         # pick another to do a second iteration
         print "Second Iteration:"
-        second_state = self.frontier[0]
-        self.explore(second_state)
+        self.current_state = self.pick_a_star()
+        self.explore(self.current_state)
         self.display_search_state(solution)
+        self.calc_a_star()
+
+        # pick another to do a second iteration
+        print "third Iteration:"
+        self.current_state = self.pick_a_star()
+        self.explore(self.current_state)
+        self.display_search_state(solution)
+
+        # # pick another to do a second iteration
+        # print "fourth Iteration:"
+        # self.current_state = self.pick_a_star()
+        # self.explore(self.current_state)
+        # self.display_search_state(solution)

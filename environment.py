@@ -80,7 +80,7 @@ class Environment:
         :param state: (State) state object in question to determine if it is a goal state
         :return: (bool) 
         """
-        goal = (self.width-1, self.height-1)
+        goal = (self.end_x, self.end_y)
         x_align = state.position[0] == goal[0]
         y_align = state.position[1] == goal[1]
 
@@ -92,7 +92,7 @@ class Environment:
         
         :return: (State): state that just holds the position of the goal
         """
-        return State(self.width-1, self.height-1)
+        return State(self.end_x, self.end_y)
 
     def get_available_moves(self, state):
         """
@@ -118,7 +118,7 @@ class Environment:
         position = state.position
 
         # Check N Movement Possible
-        if position[0] < self.height-1:
+        if position[1] < self.height-1:
             # NORTH
             # y position is lower than highest y pos possible
             # make new frontier node
@@ -136,7 +136,7 @@ class Environment:
             possible_moves.append(north_state)
 
         # Check E Movement Possible
-        if position[1] < self.width-1:
+        if position[0] < self.width-1:
             # EAST
             # x position is lower than highest x pos possible
             east_state = State(position[0]+1, position[1])
@@ -153,7 +153,7 @@ class Environment:
             possible_moves.append(east_state)
 
         # Check S Movement Possible
-        if position[0] > 0:
+        if position[1] > 0:
             # SOUTH
             # y position is greater than lowest y pos possible
             south_state = State(position[0], position[1]-1)
@@ -170,7 +170,7 @@ class Environment:
             possible_moves.append(south_state)
 
         # Check W Movement Possible
-        if position[1] > 0:
+        if position[0] > 0:
             # WEST
             # x pos is greater than lowest x pos possible
             west_state = State(position[0]-1, position[1])
