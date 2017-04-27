@@ -86,6 +86,37 @@ class Environment:
 
         return x_align and y_align
 
+    def frontier_overlap(self, start_front, end_front):
+        """
+        Tests to see if there is an intersection between the two frontiers
+        
+        :param start_front: 
+        :param end_front: 
+        :return: 
+        """
+        overlap = []
+        for start in start_front:
+            for end in end_front:
+                if start.position == end.position:
+                    sol = State(start.position[0], start.position[1])
+                    sol.cost_so_far = start.cost_so_far + end.cost_so_far
+                    sol.moves_so_far.extend(start.moves_so_far)
+                    for move in end.moves_so_far:
+                        opp = ''
+                        if move == 'N':
+                            opp = 'S'
+                        elif move == 'S':
+                            opp = 'N'
+                        elif move == 'E':
+                            opp = 'W'
+                        else:
+                            opp = 'E'
+
+                        sol.moves_so_far.append(opp)
+                    overlap.append(sol)
+
+        return overlap
+
     def get_goal_state(self):
         """
         Returns a state with the position of the goal

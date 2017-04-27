@@ -69,7 +69,7 @@ class Search(object):
                 # print self.current_state
                 return self.current_state, self.frontier, self.visited
 
-        # for i in range(0, 15):
+        # for i in range(0, 4):
         #     # pick lowest a*, state to explore
         #     # self.display_search_state()
         #     self.current_state = self.frontier.pop()
