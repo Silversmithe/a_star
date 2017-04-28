@@ -18,7 +18,7 @@ class Search(object):
             A popular Informed Search Algorithm that is both OPTIMAL and COMPLETE
         
         --- INSTANCE VARIABLES ---
-        self.frontier: ([State, ...]): list of unexplored states
+        self.frontier: [State, ...]: list of unexplored states
         
             The frontier must maintain several qualities:
             Quality 1: the lowest A* value should be in the back of the frontier so it can be popped from the back
@@ -33,22 +33,22 @@ class Search(object):
             Quality 4: When two states have the same A* but not the same position, prefer the state that has been
             in the frontier the longest for expansion
         
-        self.visited: ([State, ...]): list of explored states
+        self.visited: [State, ...]: list of explored states
             
             States are ordered in the order that they were explored in the frontier
             ex: [first_explored, second_explored, ...]
             
-        self.environment: (Environment): reference to the Environment class
+        self.environment: Environment: reference to the Environment class
             
             The environment class has all the information about the environment/map that the algorithm needs to 
             search it.
             
-        self.heuristics: (int[][]): Two dimensional array containing the heuristic values for each state
+        self.heuristics: int[][]: Two dimensional array containing the heuristic values for each state
             
             In order to reduce function calls throughout the program and slightly increase performance,
             I decided to pre-compute all the heuristic values
             
-        self.current_state: (State): The state that is currently selected for expansion
+        self.current_state: State: The state that is currently selected for expansion
             
         """
         self.frontier = [init_state]
@@ -201,8 +201,6 @@ class Search(object):
         :return: (int): A* value of the neighbor_state -- aka f(x)
         """
         cost = neighbor_state.cost_so_far
-
-        # heuristic = self.heuristic(neighbor_state, self.environment.get_goal_state())
         heuristic = self.heuristics[neighbor_state.position[0]][neighbor_state.position[1]]
         return cost+heuristic
 

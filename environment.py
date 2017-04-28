@@ -47,7 +47,6 @@ class Environment:
         """
         Identifies if given coordinates are valid positions
         
-        :tested: TRUE
         :param x_pos: (int) x coordinate position
         :param y_pos: (int) y coordinate position
         :return: (bool) if the coordinate is valid in this elevation map
@@ -60,10 +59,9 @@ class Environment:
         """
         Return the elevation at a given state
         
-        :tested: TRUE
-        :param x_pos: 
-        :param y_pos: 
-        :return: 
+        :param x_pos: int: x coordinate of the point you want the elevation of
+        :param y_pos: int: y coordinate of the point you want the elevation of
+        :return: int: elevation of coordinate space
         """
         if self.is_valid_position(x_pos=x_pos, y_pos=y_pos):
             return self.elevations[y_pos][x_pos]                # column-major ordering of elevations
@@ -73,12 +71,11 @@ class Environment:
 
     def is_goal_state(self, state):
         """
-        GOAL EVALUATION
+        --- GOAL EVALUATION ---
         Given a state, determine if it is a goal state or not
         
-        :tested: TRUE
-        :param state: (State) state object in question to determine if it is a goal state
-        :return: (bool) 
+        :param state: State: state object in question to determine if it is a goal state
+        :return: bool: is this state a goal 
         """
         goal = (self.end_x, self.end_y)
         x_align = state.position[0] == goal[0]
@@ -121,13 +118,13 @@ class Environment:
         """
         Returns a state with the position of the goal
         
-        :return: (State): state that just holds the position of the goal
+        :return: State: state that just holds the position of the goal
         """
         return State(self.end_x, self.end_y)
 
     def get_available_moves(self, state):
         """
-        TRANSITION MODEL
+        --- TRANSITION MODEL ---
         Given a state, determine the states it can transition to
         
         From a given state, the agent can move:
@@ -141,9 +138,8 @@ class Environment:
         
         Consider N before E before S before W
         
-        :tested: TRUE
-        :param state: (State) state object in question to find tran
-        :return: [State,...] list of states are ordered how they should be considered
+        :param state: State: state object in question to find tran
+        :return: [State,...]: list of states are ordered how they should be considered
         """
         possible_moves = []
         position = state.position
