@@ -183,7 +183,6 @@ class Search(object):
                             # no need to iterate anymore
                             break
 
-    # STATE CALCULATIONS
     def a_star(self, neighbor_state):
         """
         Calculates the A* value of an unexplored state
@@ -242,9 +241,9 @@ class Search(object):
             # move is Flat
             return 1
 
-    # HELPER METHOD
     def has_been_visited(self, current_state):
         """
+        --- HELPER METHOD ---
         Check and see if the state we are looking at has the same coordinates
         as a state we have already looked at
         
