@@ -105,7 +105,7 @@ class Search(object):
                     # if the state already exists in the frontier, take the one with the lowest cost
                     if not self.filter(self.back_frontier, move):
                         if not self.has_been_visited(move) and move.cost_so_far <= self.environment.energy_budget:
-                            # add move if it is within our budget and hasnt been explored yet
+                            # add move if it is within our budget and hasn't been explored yet
                             self.back_frontier.append(move)
 
             # SOLUTION TEST
@@ -192,7 +192,7 @@ class Search(object):
         """
         Calculates the cost to transition from the source state to the destination state
 
-        --- COST EQUATION ---
+        COST EQUATION:
 
             move is Downhill
                 1 + (elevation(x_old, y_old) - elevation(x_new, y_new))
@@ -222,3 +222,4 @@ class Search(object):
         else:
             # move is Flat
             return 1
+
