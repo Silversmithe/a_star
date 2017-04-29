@@ -164,7 +164,7 @@ class Search(object):
                     # LOOP to place new state accordingly
                     select = len(self.frontier)-1  # (int) tracks newly added state index
                     while select > 0:
-                        # shuffle to the back of the list as far as you can
+                        # shuffle from the front to the back of the list as far as you can
                         # swap back if your a star is higher than the guy behind you
                         if self.frontier[select].a_star > self.frontier[select-1].a_star:
                             self.frontier[select], self.frontier[select-1] = self.frontier[select-1], self.frontier[select]
