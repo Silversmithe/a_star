@@ -87,9 +87,10 @@ class Environment:
         """
         Tests to see if there is an intersection between the two frontiers
         
-        :param start_front: 
-        :param end_front: 
-        :return: 
+        :param front: [State,...]: frontier that starts from the starting position
+        :param back: [State, ...]: frontier that starts from the ending position
+        :return: [State, ...]: list of states that have paths that are solutions, ordered from
+                                smallest cost to greatest cost
         """
         overlap = []
         for start in front:
@@ -98,6 +99,8 @@ class Environment:
                     sol = State(start.position[0], start.position[1])
                     sol.cost_so_far = start.cost_so_far + end.cost_so_far
                     sol.moves_so_far.extend(start.moves_so_far)
+
+                    end.moves_so_far.reverse()
                     for move in end.moves_so_far:
                         opp = ''
                         if move == 'N':
@@ -110,9 +113,11 @@ class Environment:
                             opp = 'E'
 
                         sol.moves_so_far.append(opp)
-                    if sol.moves_so_far <= self.energy_budget:
-                        overlap.append(sol)
+                    overlap.append(sol)
+                    end.moves_so_far.reverse()
 
+        # get the solution with the smallest state first
+        overlap.sort(key=lambda node: node.cost_so_far)
         return overlap
 
     def get_goal_state(self):

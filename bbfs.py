@@ -79,19 +79,35 @@ class Search(object):
                 # get the next moves
                 moves = self.environment.get_available_moves(current_front)
                 for move in moves:
-                    if not self.has_been_visited(move):
-                        move.cost_so_far += self.cost(current_front, move)
-                        self.front_frontier.append(move)
+                    # calculate move cost
+                    move.cost_so_far += self.cost(current_front, move)
+                    # if the state already exists in the frontier, take the one with the
+                    # lowest cost
+                    move_rejected = False
+                    remove_list = []
+                    for i in range(0, len(self.front_frontier)):
+                        if move.position == self.front_frontier[i].position:
+                            # take the one with the lowest cost
+                            if move.cost_so_far < self.front_frontier[i].cost_so_far:
+                                remove_list.append(self.front_frontier[i])
+                            elif move.cost_so_far > self.front_frontier[i].cost_so_far:
+                                # new move has greater cost, dont  keep it
+                                move_rejected = True
+                            else:
+                                # if they both have the same cost, keep the older one
+                                move_rejected = True
 
-            # check to see if there is any intersection
-            overlap_test = self.environment.frontier_overlap(self.front_frontier, self.back_frontier)
-            if len(overlap_test) > 0:
-                # if there is an intersection, then there is a solution
-                final_frontier = self.front_frontier
-                final_frontier.extend(self.back_frontier)
-                # get the solution with the smallest state
-                overlap_test.sort(key=lambda node: node.cost_so_far)
-                return overlap_test[0], final_frontier, self.explored
+                    # remove all discarded nodes from frontier
+                    for node in remove_list:
+                        self.front_frontier.remove(node)
+
+                    if not move_rejected:
+                        if not self.has_been_visited(move) and move.cost_so_far <= self.environment.energy_budget:
+                            self.front_frontier.append(move)
+
+            solution_test = self.test_for_solution()
+            if solution_test is not None:
+                return solution_test
 
             if current_back is not None:
                 # if there is a new state to explore, add to explored states and insert
@@ -101,24 +117,54 @@ class Search(object):
                 # get the next moves
                 moves = self.environment.get_available_moves(current_back)
                 for move in moves:
-                    if not self.has_been_visited(move):
-                        move.cost_so_far += self.cost(current_back, move)
-                        self.back_frontier.append(move)
+                    # calculate move cost
+                    move.cost_so_far += self.cost(current_back, move)
+                    # if the state already exists in the frontier, take the one with the
+                    # lowest cost
+                    move_rejected = False
+                    remove_list = []
+                    for i in range(0, len(self.back_frontier)):
+                        if move.position == self.back_frontier[i].position:
+                            # take the one with the lowest cost
+                            if move.cost_so_far < self.back_frontier[i].cost_so_far:
+                                # remove the current node
+                                # add the new node later
+                                remove_list.append(self.back_frontier[i])
+                            elif move.cost_so_far > self.back_frontier[i].cost_so_far:
+                                # new move has greater cost, dont  keep it
+                                move_rejected = True
+                            else:
+                                # if they both have the same cost, keep the older one
+                                move_rejected = True
 
-            # check to see if there is any intersection
-            overlap_test = self.environment.frontier_overlap(self.front_frontier, self.back_frontier)
-            if len(overlap_test) > 0:
-                # if there is an intersection, then there is a solution
-                final_frontier = self.front_frontier
-                final_frontier.extend(self.back_frontier)
-                # get the solution with the smallest state
-                overlap_test.sort(key=lambda node: node.cost_so_far)
-                return overlap_test[0], final_frontier, self.explored
+                    # remove all discarded nodes from frontier
+                    for node in remove_list:
+                        self.back_frontier.remove(node)
 
-            # self.display_state()
-            # raw_input("continue...")
+                    if not move_rejected:
+                        if not self.has_been_visited(move) and move.cost_so_far <= self.environment.energy_budget:
+                            self.back_frontier.append(move)
+
+            solution_test = self.test_for_solution()
+            if solution_test is not None:
+                return solution_test
 
     # CHECKING METHODS
+    def test_for_solution(self):
+        """
+        
+        :return: 
+        """
+        # check to see if there is any intersection
+        overlap_test = self.environment.frontier_overlap(self.front_frontier, self.back_frontier)
+        if len(overlap_test) > 0:
+            # if there is an intersection, then there is a solution
+            final_frontier = self.front_frontier
+            final_frontier.extend(self.back_frontier)
+            return overlap_test[0], final_frontier, self.explored
+
+        return None
+
     def has_been_visited(self, current_state):
         """
         Check and see if the state we are looking at has the same coordinates
