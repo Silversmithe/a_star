@@ -83,24 +83,32 @@ class Environment:
 
         return x_align and y_align
 
-    def frontier_overlap(self, front, back):
+    @staticmethod
+    def frontier_overlap(front, back):
         """
         Tests to see if there is an intersection between the two frontiers
         
         :param front: [State,...]: frontier that starts from the starting position
         :param back: [State, ...]: frontier that starts from the ending position
-        :return: [State, ...]: list of states that have paths that are solutions, ordered from
-                                smallest cost to greatest cost
+        :return: State: list of states that have paths that are solutions, ordered from
+                                smallest cost to greatest cost. Pick the smallest one as the goal
         """
         overlap = []
+        # search for similar positions in the front and back frontiers
         for start in front:
             for end in back:
+                # if there are states in the front and back positions lets format them as a solution
                 if start.position == end.position:
+                    # create a new state that combines the qualities of the front and back node
                     sol = State(start.position[0], start.position[1])
                     sol.cost_so_far = start.cost_so_far + end.cost_so_far
                     sol.moves_so_far.extend(start.moves_so_far)
 
+                    # reverse moves so far from the end so we can attach the front and end solution
                     end.moves_so_far.reverse()
+
+                    # to get the solution from front to back
+                    # reverse the directions of the matching back node to backtrace your steps
                     for move in end.moves_so_far:
                         opp = ''
                         if move == 'N':
@@ -112,8 +120,12 @@ class Environment:
                         else:
                             opp = 'E'
 
+                        # building up backtrace
                         sol.moves_so_far.append(opp)
+
+                    # add the total solution to overlap list
                     overlap.append(sol)
+                    # undo the reverse of the end node
                     end.moves_so_far.reverse()
 
         # get the solution with the smallest state first

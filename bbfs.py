@@ -7,70 +7,68 @@ Author:         Alexander Adranly
 Description:    Implementation of the Search class for the Bidirectional BFS-Algorithm
 
 """
-import state
 
 
 class Search(object):
 
     def __init__(self, init_state, environment):
         """
-        frontier needs to be sorted in descending a* value
-        pull from the back, insert into the frontier based on direction preference 
+        Bidirectional Breadth First SEARCH ALGORITHM
+
+            Breadth-First Search that searches from the start state and from the goal state
+            The algorithm tries to look at the intersection of the two frontiers to find a solution
+
+        --- INSTANCE VARIABLES ---
+        self.front_frontier: [State, ...]: list of unexplored states starting from the START STATE
+        self.back_frontier: [State, ...]: list of unexplored states starting from the END STATE
+
+            The frontier must maintain several qualities:
+            FIFO Queue
+            
+            The states with the highest priority to expand are the earliest ones inserted
+            The expanded states are inserted in the back of the queue
+
+        self.explored: [State, ...]: list of explored states
+
+            States are ordered in the order that they were explored in the frontier
+            ex: [first_explored, second_explored, ...]
+
+        self.environment: Environment: reference to the Environment class
+
+            The environment class has all the information about the environment/map that the algorithm needs to 
+            search it.
+
         """
-        # FRONTIER
-        """
-            The frontier is a priority queue that keeps the lowest A* values at the front
-            When taking out values, prioritize taking N over E over S over W if they have the same value
-        """
-        self.environment = environment                          # (Environment) pointer to environment variable
-        self.front_frontier = [init_state]                      # ([state]) list of states not visited yet
+        self.environment = environment
+        self.front_frontier = [init_state]
         self.back_frontier = [self.environment.get_goal_state()]
         self.explored = []
 
     def search(self):
         """
         Bidirectional Depth-First Search Algorithm
+        Driver for the search algorithm
         
         :return: 
         solution ([char, ...]): an array of moves in order (e.g.,['N', 'E', 'E']), or None
         frontier ([State, ...]): an array of states which are in the frontier at the end of the search
         visited ([State, ...]): an array of states that have been expanded during the search
         """
-        """
-        BREADTH FIRST SEARCH
-        
-        function bfs(problem) returns a solution, or failure
-        
-            node <-- a node with State = problem.initial_state, path-cost =0
-            if problem.goal_test(node.State) then return SOLUTION(node)
-            frontier <- a FIFO queue with node as the only element
-            explored <- an empty set
-            
-            loop do
-                if empty?(frontier) then return failure
-                node <- pop(frontier) // chooses the shallowest node in frontier
-                add node.state to explored
-                for each action in problem.actions(node.state) do
-                    child <- child-node(problem, node, action)
-                    if child.state is not explored in frontier then
-                        if problem.goal-test(child.state) then return solution(child)
-                        frontier <- insert(child, frontier)
-        
-        """
 
         while True:
+            # FAILURE CASE
             # if they both go through their entire frontiers and find nothing, return
-            # FAILURE
             if len(self.front_frontier) == 0 and len(self.back_frontier) == 0:
                 final_frontier = self.front_frontier
                 final_frontier.extend(self.back_frontier)
                 return None, final_frontier, self.explored
 
+            # STEP: PICK STATES TO EXPAND FROM FRONT AND END FRONTIERS
             # if there are more states, pop from both frontiers
             current_front = None if len(self.front_frontier) == 0 else self.front_frontier.pop(0)
             current_back = None if len(self.back_frontier) == 0 else self.back_frontier.pop(0)
 
-            # add states to explored
+            # STEP: EXPLORE FRONT STATE
             if current_front is not None:
                 # if there is a new state to explore, add to explored states and insert
                 # its neighboring moves into the frontier
@@ -81,30 +79,14 @@ class Search(object):
                 for move in moves:
                     # calculate move cost
                     move.cost_so_far += self.cost(current_front, move)
-                    # if the state already exists in the frontier, take the one with the
-                    # lowest cost
-                    move_rejected = False
-                    remove_list = []
-                    for i in range(0, len(self.front_frontier)):
-                        if move.position == self.front_frontier[i].position:
-                            # take the one with the lowest cost
-                            if move.cost_so_far < self.front_frontier[i].cost_so_far:
-                                remove_list.append(self.front_frontier[i])
-                            elif move.cost_so_far > self.front_frontier[i].cost_so_far:
-                                # new move has greater cost, dont  keep it
-                                move_rejected = True
-                            else:
-                                # if they both have the same cost, keep the older one
-                                move_rejected = True
-
-                    # remove all discarded nodes from frontier
-                    for node in remove_list:
-                        self.front_frontier.remove(node)
-
-                    if not move_rejected:
+                    # REPETITIVE POSITION FILTER
+                    # if the state already exists in the frontier, take the one with the lowest cost
+                    if not self.filter(self.front_frontier, move):
                         if not self.has_been_visited(move) and move.cost_so_far <= self.environment.energy_budget:
+                            # add move if it is within our budget and hasnt been explored yet
                             self.front_frontier.append(move)
 
+            # SOLUTION TEST
             solution_test = self.test_for_solution()
             if solution_test is not None:
                 return solution_test
@@ -119,45 +101,71 @@ class Search(object):
                 for move in moves:
                     # calculate move cost
                     move.cost_so_far += self.cost(current_back, move)
-                    # if the state already exists in the frontier, take the one with the
-                    # lowest cost
-                    move_rejected = False
-                    remove_list = []
-                    for i in range(0, len(self.back_frontier)):
-                        if move.position == self.back_frontier[i].position:
-                            # take the one with the lowest cost
-                            if move.cost_so_far < self.back_frontier[i].cost_so_far:
-                                # remove the current node
-                                # add the new node later
-                                remove_list.append(self.back_frontier[i])
-                            elif move.cost_so_far > self.back_frontier[i].cost_so_far:
-                                # new move has greater cost, dont  keep it
-                                move_rejected = True
-                            else:
-                                # if they both have the same cost, keep the older one
-                                move_rejected = True
-
-                    # remove all discarded nodes from frontier
-                    for node in remove_list:
-                        self.back_frontier.remove(node)
-
-                    if not move_rejected:
+                    # REPETITIVE POSITION FILTER
+                    # if the state already exists in the frontier, take the one with the lowest cost
+                    if not self.filter(self.back_frontier, move):
                         if not self.has_been_visited(move) and move.cost_so_far <= self.environment.energy_budget:
+                            # add move if it is within our budget and hasnt been explored yet
                             self.back_frontier.append(move)
 
+            # SOLUTION TEST
             solution_test = self.test_for_solution()
             if solution_test is not None:
                 return solution_test
 
+    @staticmethod
+    def filter(frontier, node):
+        """
+        Checks to see if the frontier has any nodes with a similar position to the node
+        in question
+        The filter will then throw out one of the duplicate nodes based on their comparative costs
+        
+        :param frontier: [State, ...]: list of unexplored states that possibly share the same position as node
+        :param node: State: Node in question that may be a duplicate position with one of the frontier nodes
+        :return: (bool): was the node rejected or not?
+        """
+        move_rejected = False
+        remove_list = []
+        for i in range(0, len(frontier)):
+            if node.position == frontier[i].position:
+                # take the one with the lowest cost
+                if node.cost_so_far < frontier[i].cost_so_far:
+                    # remove the current node
+                    # add the new node later
+                    remove_list.append(frontier[i])
+                elif node.cost_so_far > frontier[i].cost_so_far:
+                    # new move has greater cost, dont  keep it
+                    move_rejected = True
+                else:
+                    # if they both have the same cost, keep the older one
+                    move_rejected = True
+
+        # remove all discarded nodes from frontier
+        for n in remove_list:
+            frontier.remove(n)
+
+        return move_rejected
+
     # CHECKING METHODS
     def test_for_solution(self):
         """
+        Tests both of the frontiers to see if there is an existing solution
+        If there is a solution, the function will return the necessary information
+        If there is not a solution, the function will return None
         
         :return: 
+        solution ([char, ...]): an array of moves in order (e.g.,['N', 'E', 'E'])
+        frontier ([State, ...]): an array of states which are in the frontier at the end of the search
+        visited ([State, ...]): an array of states that have been expanded during the search
+        
+        or
+        
+        None
         """
         # check to see if there is any intersection
         overlap_test = self.environment.frontier_overlap(self.front_frontier, self.back_frontier)
         if len(overlap_test) > 0:
+            # the solution is in the first index
             # if there is an intersection, then there is a solution
             final_frontier = self.front_frontier
             final_frontier.extend(self.back_frontier)
@@ -170,8 +178,10 @@ class Search(object):
         Check and see if the state we are looking at has the same coordinates
         as a state we have already looked at
 
-        :param current_state: 
-        :return: 
+        :param current_state: State: state in question that we want to know if we have visited already
+        :return: (bool):
+        True: the state is question has been visited
+        False: the state in question has NOT been visited
         """
         for node in self.explored:
             if current_state.position == node.position:
@@ -182,7 +192,7 @@ class Search(object):
         """
         Calculates the cost to transition from the source state to the destination state
 
-        COST EQUATION:
+        --- COST EQUATION ---
 
             move is Downhill
                 1 + (elevation(x_old, y_old) - elevation(x_new, y_new))
@@ -212,26 +222,3 @@ class Search(object):
         else:
             # move is Flat
             return 1
-
-    def display_state(self):
-        """
-        
-        :return: 
-        """
-        print '-'*50
-        print "start frontier:"
-        for node in self.front_frontier:
-            print "\t", str(node)
-
-        print "\nend frontier:"
-        for node in self.back_frontier:
-            print "\t", str(node)
-
-        print "\nexplored:"
-        for node in self.explored:
-            print "\t", str(node)
-
-        print "\nIntersections:"
-        for node in self.environment.frontier_overlap(self.front_frontier, self.back_frontier):
-            print "\t", str(node)
-        print '-'*50
