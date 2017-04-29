@@ -83,7 +83,7 @@ class Environment:
 
         return x_align and y_align
 
-    def frontier_overlap(self, start_front, end_front):
+    def frontier_overlap(self, front, back):
         """
         Tests to see if there is an intersection between the two frontiers
         
@@ -92,8 +92,8 @@ class Environment:
         :return: 
         """
         overlap = []
-        for start in start_front:
-            for end in end_front:
+        for start in front:
+            for end in back:
                 if start.position == end.position:
                     sol = State(start.position[0], start.position[1])
                     sol.cost_so_far = start.cost_so_far + end.cost_so_far
@@ -110,7 +110,8 @@ class Environment:
                             opp = 'E'
 
                         sol.moves_so_far.append(opp)
-                    overlap.append(sol)
+                    if sol.moves_so_far <= self.energy_budget:
+                        overlap.append(sol)
 
         return overlap
 
